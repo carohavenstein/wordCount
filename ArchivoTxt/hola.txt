@@ -1,1 +1,4 @@
-Caroooo
+Lo de elegancia es algo difcil de decir, es cuesti�n de gustos. 
+Pero la legibilidad del c�digo siempre es importante. 
+Por eso, este c�digo se puede simplificar as�: 
+(a mi me parece m�s legible)

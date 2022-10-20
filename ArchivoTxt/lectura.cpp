@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <fstream>
+#include <sstream>
 using namespace std;
 
 //LECTURA DE .txt
@@ -18,6 +19,8 @@ void lectura(){
 
     ifstream archivo;
     string texto;
+    string linea;
+    int contLinea = 0;
 
     archivo.open("hola.txt",ios::in); //abrimos el archivo en modo lectura 
 
@@ -32,6 +35,14 @@ void lectura(){
         cout<<texto<<endl;
         cout<<"\n\n";
     }
+
+    while(getline(archivo,linea)){
+        texto = texto + linea+"\n";
+        contLinea++;
+    }
+
+    cout<<"\nCantidad de lineas: "<<contLinea<<endl;
+
 
     archivo.close(); //cerramos el archivo
 }
