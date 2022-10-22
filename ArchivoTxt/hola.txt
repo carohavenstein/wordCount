@@ -1,4 +1,3 @@
-Lo de elegancia es algo difcil de decir, es cuesti�n de gustos. 
-Pero la legibilidad del c�digo siempre es importante. 
-Por eso, este c�digo se puede simplificar as�: 
-(a mi me parece m�s legible)
+Pero la legibilidad del codigo siempre es importante 
+Por eso este codigo se puede simplificar asi
+a mi me parece mas legible
