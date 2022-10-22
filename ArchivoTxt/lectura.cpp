@@ -21,14 +21,11 @@ int main(){
 void lectura(){
 
     ifstream archivo;
-    string texto;
     string linea;
     string palabra;
-    string letra;
     int contLinea = 0;
     int contPalabra = 0;
-    int contLetra = 0;
-    int letras;
+    int contLetras = 0;
 
 
 
@@ -44,10 +41,10 @@ void lectura(){
         contLinea++;
         cout<<linea<<endl;
 
-        //Contador Lineas
+        //Contador Letras
         for (int i = 0; i < linea.length(); i++){
-        if ((linea[i] >= 'a' && linea[i] <= 'z') || (linea[i] >= 'A' && linea[i] <= 'Z')){
-            letras += 1;
+        if (isalpha(linea[i])){
+            contLetras += 1;
             }
         }
 
@@ -61,11 +58,11 @@ void lectura(){
                 }
         }
 
-        //Contador Letras
+       
 
-    cout<<"\nNumero de LINEAS que tiene el archivo es de : " <<contLinea <<endl;
-    cout<<"\nNumero de PALABRAS que tiene el archivo es de : " <<contPalabra <<endl;
-    cout<<"\nNumero de LETRAS que tiene el archivo es de : " << letras <<endl;
+    cout<<"\nNumero de LINEAS que tiene el archivo es de: " <<contLinea <<endl;
+    cout<<"\nNumero de PALABRAS que tiene el archivo es de: " <<contPalabra <<endl;
+    cout<<"\nNumero de LETRAS que tiene el archivo es de: " << contLetras <<endl;
 
 
     archivo.close(); //cerramos el archivo
