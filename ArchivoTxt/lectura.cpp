@@ -25,7 +25,7 @@ void lectura(){
     string linea;
     string palabra;
     string letra;
-    int contLinea = 1;
+    int contLinea = 0;
     int contPalabra = 0;
     int contLetra = 0;
     int letras;
@@ -40,45 +40,32 @@ void lectura(){
     }
 
     while(!archivo.eof()){ //mietras no sea el final del archivo
-        getline(archivo,texto);
-        cout<<"\n\n";
-        cout<<texto<<endl;
-        cout<<"\n\n";
+        getline(archivo,linea);
+        contLinea++;
+        cout<<linea<<endl;
 
-        for (int i = 0; i < texto.length(); i++){
-        if ((texto[i] >= 'a' && texto[i] <= 'z') || (texto[i] >= 'A' && texto[i] <= 'Z')){
+        //Contador Lineas
+        for (int i = 0; i < linea.length(); i++){
+        if ((linea[i] >= 'a' && linea[i] <= 'z') || (linea[i] >= 'A' && linea[i] <= 'Z')){
             letras += 1;
             }
         }
 
-        while(getline(archivo,linea)){  //Contador de lineas (n - 1 lineas)
-          cout<<"L"<<contLinea<<" = "<<linea<<endl;
-          contLinea++;
-        }
-        
-        
-
-        while(getline(archivo,palabra)){  //Contador de palabras
-        
-
-            for(int i=1; palabra[i]!='\0'; ++i)   
-               if(palabra[i-1]==' '&& isalpha(palabra[i])){
+        //Contador Palabra
+        for(int i=1; linea[i]!='\0'; ++i)   
+               if(linea[i-1]==' '&& isalpha(linea[i])){
                  contPalabra++;
                 }
-                  
-                if(isalpha(palabra[0])) {
+                if(isalpha(linea[0])) {
                   contPalabra++;
                 }
         }
 
-        //Contador de letras
+        //Contador Letras
 
-    }
-    cout<<"\nNumero de lineas que tiene el archivo es de : " <<contLinea <<endl;
-    cout<<"\nNumero de palabras que tiene el archivo es de : " <<contPalabra <<endl;
-    cout<<"\nNumero de letras que tiene el archivo es de : " << letras <<endl;
-
-
+    cout<<"\nNumero de LINEAS que tiene el archivo es de : " <<contLinea <<endl;
+    cout<<"\nNumero de PALABRAS que tiene el archivo es de : " <<contPalabra <<endl;
+    cout<<"\nNumero de LETRAS que tiene el archivo es de : " << letras <<endl;
 
 
     archivo.close(); //cerramos el archivo
