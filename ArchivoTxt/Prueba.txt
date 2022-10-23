@@ -1,6 +1,4 @@
- Una solucion compleja no te asegura que la solucion 
-sencilla no sea la correcta. Con respecto a si es la solución adecuada 
-recuerda que la función getline() obtiene CADA LÍNEA DEL ARCHIVO, y 
-la guarda en la variable string linea; . La función getline() está 
-adecuada para obtener específicamente una línea del archivo, cuando getline() 
-encuentra un salto de línea ella finaliza su ejecución.
+la guarda en la variable 
+La funcion getline esta
+caro
+viki

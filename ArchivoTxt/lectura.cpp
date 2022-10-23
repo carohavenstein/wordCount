@@ -1,22 +1,36 @@
 #include <iostream>
-#include <stdlib.h>
 #include <fstream>
-#include <sstream>
 #include <string.h>
-#include <stdio.h>
-#include <windows.h>
+#include <ctime>
 using namespace std;
 
 //LECTURA DE .txt
 
 void lectura();
 
-int main(){
+int main() {
+    clock_t begin;
+
+    cout << "Comenzando a medir Tiempo\n" << endl;
+
+    begin = clock();
+    /*
+     * Insertar código a medir tiempo aquí
+     */
 
     lectura();
 
+    
+    clock_t end = clock();
+
+    double elapsed_secs = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
+
+    cout << "Tardo elapsed_secs" << elapsed_secs << "\n" << std::endl;
+
     return 0;
+
 }
+
 
 void lectura(){
 
@@ -26,8 +40,6 @@ void lectura(){
     int contLinea = 0;
     int contPalabra = 0;
     int contLetras = 0;
-
-
 
     archivo.open("Prueba.txt",ios::in); //abrimos el archivo en modo lectura 
 
@@ -58,12 +70,9 @@ void lectura(){
                 }
         }
 
-       
-
-    cout<<"\nNumero de LINEAS que tiene el archivo es de: " <<contLinea <<endl;
-    cout<<"\nNumero de PALABRAS que tiene el archivo es de: " <<contPalabra <<endl;
-    cout<<"\nNumero de LETRAS que tiene el archivo es de: " << contLetras <<endl;
-
+    cout<<"\nNumero de LINEAS que tiene el archivo es de: " <<contLinea<<endl;
+    cout<<"\nNumero de PALABRAS que tiene el archivo es de: " <<contPalabra<<endl;
+    cout<<"\nNumero de LETRAS que tiene el archivo es de: " <<contLetras<<endl;
 
     archivo.close(); //cerramos el archivo
 }
