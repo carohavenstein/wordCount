@@ -65,40 +65,26 @@ struct Argumento {
 };
 
 unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
+    
     unordered_map<string, Argumento> argumentos;
+
     for (int i = 0; i < argc; i++) {
 
         string arg(argv[i]); //convierto puntero a caracter en string para comparar los contenidos
 
-        if (arg == "-excluir") { //-excluir "palabra, palabra"
-            //eliminar esas palabras del arbol
-            stringstream palabrasExcluir(argv[i+1]); //trasnformo arg siguiente en stringstream: son las palabras a excluir separadas por ,
-            string aExcluir;
-            while (getline(palabrasExcluir, aExcluir, ',')) {
-                //aEliminar.remove()
-                // va eliminando las palabras del arbol ordenado alfbtcmt
-                //para que despues comandos palabras y ocurrencias no las muestren
-            }
-
-        } else if (arg == "-palabras") {
+        if (arg == "-palabras") {
             
             int cantMostrar = 0;
             if (isdigit(argv[i+1][0])) { //si el primer caracter del siguiente argv es un numero
                 string argumentoSig(argv[i+1]);
-                i++;
+                //i++; no se si esto funciona
                 cantMostrar = stoi(argumentoSig); //string to int
             }
 
             Argumento arg;
             arg.id = ArgType::Palabras;
             arg.n = cantMostrar;
-            argumentos["palabras"] = arg;
-           
-            if(cantMostrar == 0) {
-                //imprimir todo el arbol en orden alfabetico
-            } else {
-                //imprimir el arbol en orden alfabetico de las n primeras palabras
-            }
+            argumentos["-palabras"] = arg;
             
         } else if (arg == "-ocurrencias") {
 
@@ -108,12 +94,19 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
                 i++;
                 cantMostrar = stoi(argumentoSig); //string to int
             }
-           
-            if(cantMostrar == 0) {
-                //mostrar todas las palabras ordenadas segun ocurrencia creciente
-            } else {
-                //mostrar n palabras segun ocurrencia creciente
-            }
+
+            Argumento arg;
+            arg.id = ArgType::Ocurrencias;
+            arg.n = cantMostrar;
+            argumentos["-ocurrencias"] = arg;
+
+            /*
+                if(cantMostrar == 0) {
+                    //mostrar todas las palabras ordenadas segun ocurrencia creciente
+                } else {
+                    //mostrar n palabras segun ocurrencia creciente
+                } 
+            */
 
         } else if (arg == "-mostrar") { // -mostrar "palabra, palabra" segun ocurrencia creciente
 
@@ -124,16 +117,54 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
                 //que vaya guardando las palabras a mostrar en algun lado
                 //despues hay que ordenalas por ocurrencia (con quicksort?) y mostrarlas
             }
+        } else if (arg == "-excluir") { //-excluir "palabra, palabra"
+            //eliminar esas palabras del arbol
+
+            Argumento arg;
+            arg.id = ArgType::Excluir;
+            arg.palabras = string(argv[i+1]); //transformo el siguiente argv en string (palabras a excluir)
+            argumentos["-excluir"] = arg;
+
+            i++;
+
+            /*
+                stringstream palabrasExcluir(argv[i+1]); //trasnformo arg siguiente en stringstream: son las palabras a excluir separadas por ,
+                string aExcluir;
+                while (getline(palabrasExcluir, aExcluir, ',')) {
+                //aEliminar.remove()
+                // va eliminando las palabras del arbol ordenado alfbtcmt
+                //para que despues comandos palabras y ocurrencias no las muestren
+            */
+           
+        } else if (arg == "-excluirF") {
+            //el siguiente arg es un .txt
         }
     }
 
     return argumentos;
 }
 
-void EjecutarArgumentos(unordered_map<string, Argumento> args) {
-    Argumento palabras = args["palabras"];
-    if (palabras.id == ArgType::Palabras) {
+void EjecutarArgumentos(unordered_map<string, Argumento> args) { //tendria que pasarle el arbol tmb
+
+    Argumento palabras = args["-palabras"];
+    Argumento ocurrencias = args["-ocurrrencias"];
+    Argumento mostrar = args["-mostrar"];
+    Argumento excluir = args["-excluir"];
+    Argumento excluirF = args["-excluirF"];
+
+    if (palabras.id == ArgType::Palabras) { //para controlar si existe arg palabras, si no existe argType es nulo
+        
         // mostrarPalabras(palabras.n);
+        if(palabras.n == 0) {
+            //imprimir todo el arbol en orden alfabetico
+        } else {
+            //imprimir el arbol en orden alfabetico de las n primeras palabras
+        }
+
+    }
+
+    if (ocurrencias.id == ArgType::Ocurrencias) {
+
     }
 }
 
@@ -173,7 +204,7 @@ int main(int argc, char** argv) {
 
     clock_t end = clock();
     double elapsed_secs = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
-    cout << "Tardo elapsed_secs" << elapsed_secs << "\n" << std::endl;
+    cout << "Tardo elapsed_secs: " << elapsed_secs << "\n" << std::endl;
 
     return 0;
 }
