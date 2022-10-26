@@ -74,8 +74,12 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
 
         if (arg == "-palabras") {
             
+            cout << "palabras estaba en argumentos" << endl;
+
             int cantMostrar = 0;
-            if (isdigit(argv[i+1][0])) { //si el primer caracter del siguiente argv es un numero
+            //si el primer caracter del siguiente argv es un numero
+            //y que exista el siguiente argv, porque puede no haber
+            if ((i+1 < argc) && isdigit(argv[i+1][0])) {
                 string argumentoSig(argv[i+1]);
                 //i++; no se si esto funciona
                 cantMostrar = stoi(argumentoSig); //string to int
@@ -88,8 +92,12 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
             
         } else if (arg == "-ocurrencias") {
 
+            cout << "ocurrencias estaba en argumentos" << endl;
+
             int cantMostrar = 0;
-            if (isdigit(argv[i+1][0])) { //si el primer caracter del siguiente argv es un numero
+            //si el primer caracter del siguiente argv es un numero
+            //y que exista el siguiente argv, porque puede no haber
+            if ((i+1 < argc) && isdigit(argv[i+1][0])) {
                 string argumentoSig(argv[i+1]);
                 i++;
                 cantMostrar = stoi(argumentoSig); //string to int
@@ -110,6 +118,8 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
 
         } else if (arg == "-mostrar") { // -mostrar "palabra, palabra" segun ocurrencia creciente
 
+            cout << "mostrar estaba en argumentos" << endl;
+
             stringstream palabrasMostrar(argv[i+1]); //trasnformo arg siguiente en stringstream: son las palabras a mostrar separadas por ,
             string aMostrar;
             while (getline(palabrasMostrar, aMostrar, ',')) {
@@ -119,6 +129,8 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
             }
         } else if (arg == "-excluir") { //-excluir "palabra, palabra"
             //eliminar esas palabras del arbol
+
+            cout << "excluir estaba en argumentos" << endl;
 
             Argumento arg;
             arg.id = ArgType::Excluir;
@@ -138,6 +150,8 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
            
         } else if (arg == "-excluirF") {
             //el siguiente arg es un .txt
+            cout << "excluirF estaba en argumentos" << endl;
+
         }
     }
 
@@ -152,7 +166,8 @@ void EjecutarArgumentos(unordered_map<string, Argumento> args) { //tendria que p
     Argumento excluir = args["-excluir"];
     Argumento excluirF = args["-excluirF"];
 
-    if (palabras.id == ArgType::Palabras) { //para controlar si existe arg palabras, si no existe argType es nulo
+    if (palabras.id == ArgType::Palabras) {
+        //para controlar si existe arg palabras, si no existe argType es nulo
         
         // mostrarPalabras(palabras.n);
         if(palabras.n == 0) {
@@ -191,16 +206,19 @@ int main(int argc, char** argv) {
 
     
     //arbolPalabrasDif = construirArbol(archivo, contLineas, contPalabras, contLetras);
+
     construirArbol(archivo, contLineas, contPalabras, contLetras);
 
-    cout<<"\nNumero de LINEAS que tiene el archivo es de: " <<contLineas<<endl;
-    cout<<"\nNumero de PALABRAS que tiene el archivo es de: " <<contPalabras<<endl;
-    cout<<"\nNumero de LETRAS que tiene el archivo es de: " <<contLetras<<endl;
+    cout<<"\nNumero de LINEAS: " <<contLineas<<endl;
+    cout<<"\nNumero de PALABRAS: " <<contPalabras<<endl;
+    cout<<"\nNumero de LETRAS: " <<contLetras<<endl;
+    //para mostrar cant de palabras diferentes
+    //cout<<"\nPalabras diferentes: arbolPalabrasDif->get(cantNodos);
 
     archivo.close(); //cerramos el archivo
 
     auto argumentos = parseArgumentos(argc, argv);
-    EjecutarArgumentos(argumentos);    
+    //EjecutarArgumentos(argumentos);    
 
     clock_t end = clock();
     double elapsed_secs = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
