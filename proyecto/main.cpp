@@ -46,12 +46,12 @@ void funcionesBasicas(ifstream& archivo, int& contLineas, int& contPalabras, int
 //deberia devolver el hashmap
 void funcionExcluir(string palabrasArgv) {
     
-    //trasnformo argv de palabras a expluir en stringstream: son las palabras a excluir separadas por ,
+    //trasnformo argv de palabras a excluir en stringstream: son las palabras a excluir separadas por ,
     stringstream palabrasExcluir(palabrasArgv);
     string aExcluir;
 
     while (getline(palabrasExcluir, aExcluir, ',')) {
-        cout<<"palabra a excluir: "<<aExcluir<<endl;
+        //cout<<"palabra a excluir: "<<aExcluir<<endl;
         //aEliminar.remove()
         //va eliminando las palabras del hashmap
         //para que despues comandos palabras y ocurrencias no las muestren
@@ -75,6 +75,7 @@ void funcionExcluirF(string palabrasArgv){
     while(!archivo.eof()) { //mietras no sea el final del archivo
         
         getline(archivo,linea);
+        cout << linea << endl;
 
         string palabra = "";
 
@@ -84,7 +85,7 @@ void funcionExcluirF(string palabrasArgv){
                 palabra += linea[i];
             } else {
                 if (palabra != "") {
-                    cout << "palabra a excluir del file ign.txt: " << palabra << endl;
+                    //cout << "palabra a excluir del file ign.txt: " << palabra << endl;
                     //eliminarla del hashmap
                 }
                 palabra = "";
@@ -96,14 +97,14 @@ void funcionExcluirF(string palabrasArgv){
 
 void funcionMostrar(string palabrasArgv){
 
-    //trasnformo argv de palabras a expluir en stringstream: son las palabras a excluir separadas por ,
+    //trasnformo argv de palabras a mostrar en stringstream: son las palabras a mostrar separadas por ,
     stringstream palabrasMostrar(palabrasArgv);
     string aMostrar;
     int size = 0;
     while (getline(palabrasMostrar, aMostrar, ',')) {
         size ++;
         //aMostrar.search() la busco en el hashmap
-        //que vaya guardando las palabras a mostrar en algun lado
+        //que vaya guardando las palabras a mostrar en algun lado, PROBLEMA: como se tamaño del arreglo donde las guardo?
         //despues hay que ordenalas por ocurrencia (con quicksort?) y mostrarlas
     }
 
@@ -111,6 +112,7 @@ void funcionMostrar(string palabrasArgv){
 
 enum class ArgType {
     Nulo = 0,
+    Archivo,
     Palabras,
     Ocurrencias,
     Mostrar,
@@ -183,12 +185,17 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
             i++;
            
         } else if (arg == "-excluirF") { //el siguiente arg es un ign.txt
-            
             Argumento arg;
             arg.id = ArgType::ExcluirF;
-            arg.palabrasArgv = string(argv[i+1]);
-            argumentos["-excluir"] = arg;
+            arg.palabrasArgv = string(argv[i+1]); //transformo el siguiente argv en string (.txt a ignorar)
+            argumentos["-excluirF"] = arg;
             i++;
+
+        } else {
+            Argumento arg;
+            arg.id = ArgType::Archivo;
+            arg.palabrasArgv = string(argv[i]); //transformo el argv en string (.txt)
+            argumentos["archivo"] = arg;
         }
     }
 
@@ -196,7 +203,6 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
 }
 
 void ejecutarArgumentos(unordered_map<string, Argumento> args) { //pasarle el hashmap de palabras
-
     Argumento palabras = args["-palabras"];
     Argumento ocurrencias = args["-ocurrrencias"];
     Argumento mostrar = args["-mostrar"];
@@ -212,11 +218,11 @@ void ejecutarArgumentos(unordered_map<string, Argumento> args) { //pasarle el ha
 
     if (excluirF.id == ArgType::ExcluirF) {
         funcionExcluirF(excluirF.palabrasArgv);
-        
+
     }
 
     if (palabras.id == ArgType::Palabras) {
-        //para controlar si existe arg palabras, si no existe argType es nulo
+        //para controlar si existe arg palabras, si no existe argType es nulo - PARA TODOS ==
         if(palabras.n == 0) {
             //ordenar todo el hashmap alfabeticamente y mostrarlo
         } else {
@@ -226,16 +232,14 @@ void ejecutarArgumentos(unordered_map<string, Argumento> args) { //pasarle el ha
     }
 
     if (ocurrencias.id == ArgType::Ocurrencias) {
-        
+        if(ocurrencias.n == 0) {
+            //ordenar todo el hashmap por ocurrencia creciente y mostrarlo
+        } else {
+            //ordenar todo el hashmap por ocurrencia creciente y mostrar las primeras n
+        }
     }
 
     if (mostrar.id == ArgType::Mostrar) {
-        
-        if(mostrar.n == 0) {
-            //mostrar todas las palabras ordenadas segun ocurrencia creciente
-        } else {
-            //mostrar n palabras segun ocurrencia creciente
-        } 
 
         funcionMostrar(mostrar.palabrasArgv);
     }
@@ -255,11 +259,16 @@ int main(int argc, char** argv) {
     int contLetras = 0;
     int contPalabrasDif = 0;
 
-    if (argc == 2 && string(argv[1]) == "file.txt") {
+
+    auto argumentos = parseArgumentos(argc, argv);
+    Argumento file = argumentos["archivo"];
+
+    //si ademas del ejecutable solo te pasaron como argumento un archivo .txt ->funciones basicas
+    if (argc == 2 && file.id != ArgType::Nulo) {
         
         ifstream archivo;
         //abrimos el archivo en modo lectura 
-        archivo.open(argv[1],ios::in);
+        archivo.open(file.palabrasArgv,ios::in);
         
         if (archivo.fail()) {
             cout<<"No se pudo abrir el archivo";
@@ -279,7 +288,6 @@ int main(int argc, char** argv) {
 
     } else {
         //creo el hashmap
-        auto argumentos = parseArgumentos(argc, argv);
         ejecutarArgumentos(argumentos);
     }
     
