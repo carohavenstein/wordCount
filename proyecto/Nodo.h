@@ -1,5 +1,4 @@
-#ifndef NODO_H
-#define NODO_H
+#pragma once
 
 template<class T>
 class Nodo {
@@ -26,5 +25,3 @@ class Nodo {
             siguiente = s;
         }
 };
-
-#endif //NODO_H

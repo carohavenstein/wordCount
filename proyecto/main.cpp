@@ -4,9 +4,8 @@
 #include <ctime>
 #include <sstream>
 #include <unordered_map>
-#include "HashMamp.h"
+#include "HashMapList.h"
 using namespace std;
-
 
 /*
 funcion:
@@ -70,7 +69,9 @@ mete palabra por palabra en hashmap
 recibe un archivo .txt
 devuelve hashmap
 */
-HashMap<string, int> leerArchivo(string fileName) {
+HashMapList<string, int> leerArchivo(string fileName) {
+
+    HashMapList<string, int> tablaPalabras(4000, hashFunc);
 
     string linea;
     ifstream archivo;
@@ -102,7 +103,8 @@ HashMap<string, int> leerArchivo(string fileName) {
 
     }
 
-    archivo.close(); //cerramos el archi            
+    archivo.close(); //cerramos el archivo
+    return tablaPalabras;          
 }
 
 
@@ -274,11 +276,11 @@ unsigned int hashFunc(string clave){
         hash += clave[i];
     }
     hash += clave[0];
-    hash = hash % 4000;
     return hash;
 }
 
 void ejecutarArgumentos(unordered_map<string, Argumento> args) {
+
     Argumento palabras = args["-palabras"];
     Argumento ocurrencias = args["-ocurrrencias"];
     Argumento mostrar = args["-mostrar"];
@@ -286,15 +288,13 @@ void ejecutarArgumentos(unordered_map<string, Argumento> args) {
     Argumento excluirF = args["-excluirF"];
     Argumento file = args["archivo"];
 
-
-    HashMap<string, int> tablaPalabras(4000, hashFunc);
+    HashMapList<string, int> tablaPalabras(4000, hashFunc);
     string fileName = file.palabrasArgv;
 
     tablaPalabras = leerArchivo(fileName);
 
     if (excluir.id == ArgType::Excluir) {
-        //que leerArchivo devuelva el hashmap
-        leerArchivo(file.palabrasArgv);
+        
 
         funcionExcluir(excluir.palabrasArgv);
 

@@ -1,5 +1,4 @@
-#ifndef U05_HASH_HASHMAP_HASHENTRY_H_
-#define U05_HASH_HASHMAP_HASHENTRY_H_
+#pragma once
 
 //HashEntry = Nodo = Fila = Entrada de la tabla
 /**
@@ -15,8 +14,9 @@ template <class K, class T>
 class HashEntry {//mapear un valor de un lugar a otro a través de alguna función, de algún método
 private:
 
-    K clave;
-    T valor;
+    K clave; //palabra
+    T valor; //palabra despues de funcion hash
+    int ocurrencias = 1; //A CHECKEAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! o 0?
 
 public:
     HashEntry(K c, T v) {
@@ -44,5 +44,3 @@ public:
         valor = v;
     }
 };
-
-#endif // U05_HASH_HASHMAP_HASHENTRY_H_

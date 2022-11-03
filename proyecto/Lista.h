@@ -1,5 +1,4 @@
-#ifndef U02_LISTAS_LISTA_LISTA_H_
-#define U02_LISTAS_LISTA_LISTA_H_
+#pragma once
 
 #include <iostream>
 #include "Nodo.h"
@@ -13,7 +12,7 @@ template <class T>
 class Lista {
     private:
         Nodo<T> *inicio;
-
+        int sizeList = 0;
 
     public:
         Lista();
@@ -155,9 +154,9 @@ void Lista<T>::insertarPrimero(T dato) {
  */
 template <class T>
 void Lista<T>::insertarUltimo(T dato) {
-    Nodo<T> *aux = inicio;
+    Nodo<T>* aux = inicio;
 
-    Nodo<T> *nuevo = new Nodo<T>(dato, inicio);
+    Nodo<T>* nuevo = new Nodo<T>(dato, inicio);
     nuevo->setDato(dato);
 
     if(aux == nullptr) {
@@ -169,7 +168,7 @@ void Lista<T>::insertarUltimo(T dato) {
     while(aux->getSiguiente() != nullptr) {
         aux = aux->getSiguiente();
     }
-
+    sizeList++;
     nuevo->setSiguiente(aux->getSiguiente());
     aux->setSiguiente(nuevo);
 }
@@ -315,5 +314,3 @@ template <class T>
 Nodo<T> *Lista<T>::getInicio() {
     return inicio;
 }
-
-#endif // U02_LISTAS_LISTA_LISTA_H_

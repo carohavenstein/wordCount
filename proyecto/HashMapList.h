@@ -1,5 +1,4 @@
-#ifndef U05_HASH_HASHMAP_HASHMAPLIST_H_
-#define U05_HASH_HASHMAP_HASHMAPLIST_H_
+#pragma once
 
 #include "HashEntry.h"
 #include "Lista.h"
@@ -69,6 +68,15 @@ void HashMapList<K, T>::put(K clave, T valor) {
 
     if(tabla[pos] == NULL) {
         tabla[pos] = new Lista<HashEntry<K, T>>();
+        tabla[pos]->insertarUltimo(new HashEntry<K, T>(clave, valor));
+
+    } else {
+        //deberia controlar para la lista ya existente en esa posicion, si algun nodo tiene la misma clave
+        //si hay, sumarle 1 a ocurrencias
+        //si no, insertar ultimo
+        if (clave == tabla[pos].getClave()) {
+            
+        }
     }
 
     tabla[pos]->insertarUltimo(new HashEntry<K, T>(clave, valor));
@@ -122,5 +130,3 @@ void HashMapList<K, T>::getList(K clave) { //Método que devuelve la lista segú
         aux = aux->getSiguiente();
     }
 }
-
-#endif // U05_HASH_HASHMAP_HASHMAPLIST_H_
