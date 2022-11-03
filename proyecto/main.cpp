@@ -4,7 +4,6 @@
 #include <ctime>
 #include <sstream>
 #include <unordered_map>
-//#include "ArbolBinario.h"
 #include "HashMamp.h"
 using namespace std;
 
@@ -71,7 +70,7 @@ mete palabra por palabra en hashmap
 recibe un archivo .txt
 devuelve hashmap
 */
-void leerArchivo(string fileName) {
+HashMap<string, int> leerArchivo(string fileName) {
 
     string linea;
     ifstream archivo;
@@ -291,7 +290,7 @@ void ejecutarArgumentos(unordered_map<string, Argumento> args) {
     HashMap<string, int> tablaPalabras(4000, hashFunc);
     string fileName = file.palabrasArgv;
 
-    leerArchivo(fileName);
+    tablaPalabras = leerArchivo(fileName);
 
     if (excluir.id == ArgType::Excluir) {
         //que leerArchivo devuelva el hashmap
