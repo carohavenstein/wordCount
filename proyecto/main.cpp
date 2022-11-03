@@ -4,16 +4,32 @@
 #include <ctime>
 #include <sstream>
 #include <unordered_map>
+//#include "ArbolBinario.h"
+#include "HashMamp.h"
 using namespace std;
+
 
 /*
 funcion:
-cuenta cantidad de letras palabras y lineas del file.txt
+cuenta cantidad de letras, palabras y lineas del file.txt
 cuenta cantidad de palabras diferentes
 */
-void funcionesBasicas(ifstream& archivo, int& contLineas, int& contPalabras, int& contLetras, int& contPalabrasDif) {
+void funcionesBasicas(string fileName) {
             
+    int contLineas = 0;
+    int contPalabras = 0;
+    int contLetras = 0;
+    int contPalabrasDif = 0;
     string linea;
+
+    ifstream archivo;
+    //abrimos el archivo en modo lectura 
+    archivo.open(fileName,ios::in);
+        
+    if (archivo.fail()) {
+        cout<<"No se pudo abrir el archivo";
+        exit(1);
+    }
 
     while(!archivo.eof()) { //mietras no sea el final del archivo
         
@@ -29,7 +45,7 @@ void funcionesBasicas(ifstream& archivo, int& contLineas, int& contPalabras, int
                 palabra += linea[i];
             } else {
                 if (palabra != "") {
-                    //meterla en el hash map; !!!!!!!!!!!!!!
+                    //meterla en el hash map que vaya contando palbras DIF !!!!!!!!!!!!!!
                     contPalabras++;
                 }
                 palabra = "";
@@ -39,11 +55,59 @@ void funcionesBasicas(ifstream& archivo, int& contLineas, int& contPalabras, int
     }
 
     //contPalabrasDif = cantpalabrasdif del hashmap
+    
+    cout<<"\nNumero de LINEAS: " <<contLineas<<endl;
+    cout<<"\nNumero de PALABRAS: " <<contPalabras<<endl;
+    cout<<"\nNumero de LETRAS: " <<contLetras<<endl;
+    //cout<<"\nPalabras diferentes: " <<contPalabrasDif<<endl;
+
+    archivo.close(); //cerramos el archivo
 
 }
 
+/*
+funcion que lee archivo.txt
+mete palabra por palabra en hashmap
+recibe un archivo .txt
+devuelve hashmap
+*/
+void leerArchivo(string fileName) {
 
-//deberia devolver el hashmap
+    string linea;
+    ifstream archivo;
+    //abrimos el archivo en modo lectura 
+    archivo.open(fileName,ios::in);
+        
+    if (archivo.fail()) {
+        cout<<"No se pudo abrir el archivo";
+        exit(1);
+    }
+
+    while(!archivo.eof()) { //mietras no sea el final del archivo
+        
+        getline(archivo,linea);
+
+        string palabra = "";
+
+        for (int i = 0; i < linea.length()+1; i++){
+
+            if (isalpha(linea[i])){
+                palabra += linea[i];
+            } else {
+                if (palabra != "") {
+                    //meterla en el hash map que vaya contando palbras DIF !!!!!!!!!!!!!!
+                }
+                palabra = "";
+            }
+        }
+
+    }
+
+    archivo.close(); //cerramos el archi            
+}
+
+
+
 void funcionExcluir(string palabrasArgv) {
     
     //trasnformo argv de palabras a excluir en stringstream: son las palabras a excluir separadas por ,
@@ -187,6 +251,7 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
         } else if (arg == "-excluirF") { //el siguiente arg es un ign.txt
             Argumento arg;
             arg.id = ArgType::ExcluirF;
+            //guarda nombre del archivo a ignorar en palabrasArgv
             arg.palabrasArgv = string(argv[i+1]); //transformo el siguiente argv en string (.txt a ignorar)
             argumentos["-excluirF"] = arg;
             i++;
@@ -202,16 +267,36 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
     return argumentos;
 }
 
-void ejecutarArgumentos(unordered_map<string, Argumento> args) { //pasarle el hashmap de palabras
+unsigned int hashFunc(string clave){
+    
+    int hash;
+
+    for(int i = 0; i < clave.length(); i++) {
+        hash += clave[i];
+    }
+    hash += clave[0];
+    hash = hash % 4000;
+    return hash;
+}
+
+void ejecutarArgumentos(unordered_map<string, Argumento> args) {
     Argumento palabras = args["-palabras"];
     Argumento ocurrencias = args["-ocurrrencias"];
     Argumento mostrar = args["-mostrar"];
     Argumento excluir = args["-excluir"];
     Argumento excluirF = args["-excluirF"];
+    Argumento file = args["archivo"];
+
+
+    HashMap<string, int> tablaPalabras(4000, hashFunc);
+    string fileName = file.palabrasArgv;
+
+    leerArchivo(fileName);
 
     if (excluir.id == ArgType::Excluir) {
-        //reciba el hashmap, y el string de palabras a ignorar y las elimine del hashmap
-        //que devuelva el hashmap, mapaPalabras = mapa devuelto.
+        //que leerArchivo devuelva el hashmap
+        leerArchivo(file.palabrasArgv);
+
         funcionExcluir(excluir.palabrasArgv);
 
     }
@@ -222,7 +307,7 @@ void ejecutarArgumentos(unordered_map<string, Argumento> args) { //pasarle el ha
     }
 
     if (palabras.id == ArgType::Palabras) {
-        //para controlar si existe arg palabras, si no existe argType es nulo - PARA TODOS ==
+        //para controlar si existe arg palabras, si no existe argType es nulo - PARA TODOS IGUAL
         if(palabras.n == 0) {
             //ordenar todo el hashmap alfabeticamente y mostrarlo
         } else {
@@ -253,43 +338,24 @@ int main(int argc, char** argv) {
     cout << "Comenzando a medir Tiempo\n" << endl;
     begin = clock();
 
-
-    int contLineas = 0;
-    int contPalabras = 0;
-    int contLetras = 0;
-    int contPalabrasDif = 0;
-
-
     auto argumentos = parseArgumentos(argc, argv);
     Argumento file = argumentos["archivo"];
 
     //si ademas del ejecutable solo te pasaron como argumento un archivo .txt ->funciones basicas
     if (argc == 2 && file.id != ArgType::Nulo) {
         
-        ifstream archivo;
-        //abrimos el archivo en modo lectura 
-        archivo.open(file.palabrasArgv,ios::in);
-        
-        if (archivo.fail()) {
-            cout<<"No se pudo abrir el archivo";
-            exit(1);
-        }
+        string fileName = file.palabrasArgv;
 
-        //Arbol arbolPalabrasDif;
-        //arbolPalabrasDif = construirArbol(archivo, contLineas, contPalabras, contLetras);
-        funcionesBasicas(archivo, contLineas, contPalabras, contLetras, contPalabrasDif);
-
-        cout<<"\nNumero de LINEAS: " <<contLineas<<endl;
-        cout<<"\nNumero de PALABRAS: " <<contPalabras<<endl;
-        cout<<"\nNumero de LETRAS: " <<contLetras<<endl;
-        //cout<<"\nPalabras diferentes: " <<contPalabrasDif<<endl;
-        
-        archivo.close(); //cerramos el archivo
+        funcionesBasicas(fileName);
 
     } else {
-        //creo el hashmap
+
+        string fileName = file.palabrasArgv;
+
         ejecutarArgumentos(argumentos);
+   
     }
+    
     
 
     clock_t end = clock();
