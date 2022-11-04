@@ -36,6 +36,14 @@ public:
         clave = c;
     }
 
+    void aumentarOcurrencias() {
+        ocurrencias++;
+    }
+
+    int getOcurrencias() {
+        return ocurrencias;
+    }
+
     T getValor() {
         return valor;
     }

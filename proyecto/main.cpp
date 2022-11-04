@@ -7,13 +7,26 @@
 #include "HashMapList.h"
 using namespace std;
 
+unsigned int hashFunc(string clave){
+    
+    int hashValue;
+
+    for(int i = 0; i < clave.length(); i++) {
+        hashValue += clave[i];
+    }
+    hashValue += clave[0];
+    return hashValue;
+}
+
 /*
 funcion:
 cuenta cantidad de letras, palabras y lineas del file.txt
 cuenta cantidad de palabras diferentes
 */
 void funcionesBasicas(string fileName) {
-            
+    
+    HashMapList<string, int> tablaPalabras(4000, hashFunc);
+
     int contLineas = 0;
     int contPalabras = 0;
     int contLetras = 0;
@@ -43,7 +56,9 @@ void funcionesBasicas(string fileName) {
                 palabra += linea[i];
             } else {
                 if (palabra != "") {
-                    //meterla en el hash map que vaya contando palbras DIF !!!!!!!!!!!!!!
+                    //meterla en el hash map que vaya contando palabras DIF
+                    unsigned int valor = hashFunc(palabra);
+                    tablaPalabras.put(palabra, valor);
                     contPalabras++;
                 }
                 palabra = "";
@@ -51,6 +66,8 @@ void funcionesBasicas(string fileName) {
         }
 
     }
+
+    tablaPalabras.print();
 
     //contPalabrasDif = cantpalabrasdif del hashmap
     
@@ -62,6 +79,7 @@ void funcionesBasicas(string fileName) {
     archivo.close(); //cerramos el archivo
 
 }
+
 
 /*
 funcion que lee archivo.txt
@@ -95,7 +113,9 @@ HashMapList<string, int> leerArchivo(string fileName) {
                 palabra += linea[i];
             } else {
                 if (palabra != "") {
-                    //meterla en el hash map que vaya contando palbras DIF !!!!!!!!!!!!!!
+                    //meterla en el hash map que vaya contando palabras DIF !!!!!!!!!!!!!!
+                    unsigned int valor = hashFunc(palabra);
+                    tablaPalabras.put(palabra, valor);
                 }
                 palabra = "";
             }
@@ -268,16 +288,6 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
     return argumentos;
 }
 
-unsigned int hashFunc(string clave){
-    
-    int hash;
-
-    for(int i = 0; i < clave.length(); i++) {
-        hash += clave[i];
-    }
-    hash += clave[0];
-    return hash;
-}
 
 void ejecutarArgumentos(unordered_map<string, Argumento> args) {
 
@@ -346,6 +356,8 @@ int main(int argc, char** argv) {
         string fileName = file.palabrasArgv;
 
         funcionesBasicas(fileName);
+
+
 
     } else {
 

@@ -67,19 +67,39 @@ void HashMapList<K, T>::put(K clave, T valor) {
     unsigned int pos = hashFuncP(clave) % tamanio;
 
     if(tabla[pos] == NULL) {
+
         tabla[pos] = new Lista<HashEntry<K, T>>();
-        tabla[pos]->insertarUltimo(new HashEntry<K, T>(clave, valor));
 
     } else {
-        //deberia controlar para la lista ya existente en esa posicion, si algun nodo tiene la misma clave
+        //controla para la lista ya existente en esa posicion,
+        //si algun nodo tiene la misma clave (palabra)
         //si hay, sumarle 1 a ocurrencias
         //si no, insertar ultimo
-        if (clave == tabla[pos].getClave()) {
+        Nodo<HashEntry<K, T>> *aux = tabla[pos]->getInicio();
+
+        while (aux != NULL) {
+
+            std::cout <<"Clave: "<< aux->getDato().getClave() << std::endl;
+            std::cout <<"Valor: "<< aux->getDato().getValor() << std::endl;
             
-        }
+            if (clave == aux->getDato().getClave()) {
+                aux->getDato().aumentarOcurrencias(); //NO ANDA BIEN
+                std::cout <<"Ocurrencias: "<< aux->getDato().getOcurrencias() << std::endl;
+                //return; //esto sale solo del if? o del metodo tmb?
+                break;
+            } else {
+
+                aux = aux->getSiguiente();
+
+            }
+
+        } 
+    
     }
 
-    tabla[pos]->insertarUltimo(new HashEntry<K, T>(clave, valor));
+    //o no habia nada en esta posicion o,
+    //recorrio lista y no encontro la misma clave (palabra), hay que agregarla
+    tabla[pos]->insertarUltimo(HashEntry<K, T>(clave, valor));
 }
 
 template <class K, class T>
@@ -90,7 +110,7 @@ void HashMapList<K, T>::remove(K clave) {
         throw 404;
     }
 
-    T dato // = get(clave);
+    T dato; // = get(clave)
 
     tabla[pos]->remove({clave, dato});
 
