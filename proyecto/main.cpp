@@ -4,6 +4,9 @@
 #include <ctime>
 #include <sstream>
 #include <unordered_map>
+#include <algorithm>
+#include <vector>
+
 #include "HashMapList.h"
 using namespace std;
 
@@ -17,7 +20,6 @@ unsigned int hashFunc(string clave){
     hashValue += clave[0];
     return hashValue;
 }
-
 /*
 funcion:
 cuenta cantidad de letras, palabras y lineas del file.txt
@@ -30,7 +32,6 @@ void funcionesBasicas(string fileName) {
     int contLineas = 0;
     int contPalabras = 0;
     int contLetras = 0;
-    int contPalabrasDif = 0;
     string linea;
 
     ifstream archivo;
@@ -49,16 +50,16 @@ void funcionesBasicas(string fileName) {
 
         string palabra = "";
 
-        for (int i = 0; i < linea.length()+1; i++){
+        for (int i = 0; i < linea.length()+1; i++) {
 
             if (isalpha(linea[i])){
                 contLetras += 1;
-                palabra += linea[i];
+                palabra += tolower(linea[i]);
             } else {
                 if (palabra != "") {
                     //meterla en el hash map que vaya contando palabras DIF
                     unsigned int valor = hashFunc(palabra);
-                    tablaPalabras.put(palabra, valor);
+                    tablaPalabras.put(palabra);
                     contPalabras++;
                 }
                 palabra = "";
@@ -66,15 +67,11 @@ void funcionesBasicas(string fileName) {
         }
 
     }
-
-    tablaPalabras.print();
-
-    //contPalabrasDif = cantpalabrasdif del hashmap
     
     cout<<"\nNumero de LINEAS: " <<contLineas<<endl;
     cout<<"\nNumero de PALABRAS: " <<contPalabras<<endl;
     cout<<"\nNumero de LETRAS: " <<contLetras<<endl;
-    //cout<<"\nPalabras diferentes: " <<contPalabrasDif<<endl;
+    cout<<"\nNumero de PALABRAS DIFERENTES: " <<tablaPalabras.getPalabrasDiferentes()<<endl;
 
     archivo.close(); //cerramos el archivo
 
@@ -87,9 +84,9 @@ mete palabra por palabra en hashmap
 recibe un archivo .txt
 devuelve hashmap
 */
-HashMapList<string, int> leerArchivo(string fileName) {
+HashMapList<string, int>* leerArchivo(string fileName) {
 
-    HashMapList<string, int> tablaPalabras(4000, hashFunc);
+    HashMapList<string, int>* tablaPalabras = new HashMapList<string, int>(4000, hashFunc);
 
     string linea;
     ifstream archivo;
@@ -110,12 +107,12 @@ HashMapList<string, int> leerArchivo(string fileName) {
         for (int i = 0; i < linea.length()+1; i++){
 
             if (isalpha(linea[i])){
-                palabra += linea[i];
+                palabra += tolower(linea[i]);
             } else {
                 if (palabra != "") {
                     //meterla en el hash map que vaya contando palabras DIF !!!!!!!!!!!!!!
                     unsigned int valor = hashFunc(palabra);
-                    tablaPalabras.put(palabra, valor);
+                    tablaPalabras->put(palabra);
                 }
                 palabra = "";
             }
@@ -128,24 +125,23 @@ HashMapList<string, int> leerArchivo(string fileName) {
 }
 
 
-
-void funcionExcluir(string palabrasArgv) {
+void funcionExcluir(string palabrasArgv, HashMapList<string, int>* map) {
     
     //trasnformo argv de palabras a excluir en stringstream: son las palabras a excluir separadas por ,
     stringstream palabrasExcluir(palabrasArgv);
     string aExcluir;
 
     while (getline(palabrasExcluir, aExcluir, ',')) {
-        //cout<<"palabra a excluir: "<<aExcluir<<endl;
-        //aEliminar.remove()
+        //eliminar espacios de la palabra
+        aExcluir.erase(remove(aExcluir.begin(), aExcluir.end(), ' '), aExcluir.end());
+        map->remove(aExcluir);
         //va eliminando las palabras del hashmap
         //para que despues comandos palabras y ocurrencias no las muestren
     }
     
 }
 
-//deberia devolver el hasmap
-void funcionExcluirF(string palabrasArgv){
+void funcionExcluirF(string palabrasArgv, HashMapList<string, int>* map){
     ifstream archivo;
     //abrimos el archivo en modo lectura 
     archivo.open(palabrasArgv,ios::in);
@@ -160,7 +156,6 @@ void funcionExcluirF(string palabrasArgv){
     while(!archivo.eof()) { //mietras no sea el final del archivo
         
         getline(archivo,linea);
-        cout << linea << endl;
 
         string palabra = "";
 
@@ -170,8 +165,8 @@ void funcionExcluirF(string palabrasArgv){
                 palabra += linea[i];
             } else {
                 if (palabra != "") {
-                    //cout << "palabra a excluir del file ign.txt: " << palabra << endl;
                     //eliminarla del hashmap
+                    map->remove(palabra);
                 }
                 palabra = "";
             }
@@ -180,17 +175,31 @@ void funcionExcluirF(string palabrasArgv){
     }
 }
 
-void funcionMostrar(string palabrasArgv){
-
+void funcionMostrar(string palabrasArgv, HashMapList<string, int>* map){
     //trasnformo argv de palabras a mostrar en stringstream: son las palabras a mostrar separadas por ,
     stringstream palabrasMostrar(palabrasArgv);
     string aMostrar;
-    int size = 0;
+    vector<HashEntry<string, int>> vectorPalabrasAMostrar;
     while (getline(palabrasMostrar, aMostrar, ',')) {
-        size ++;
-        //aMostrar.search() la busco en el hashmap
-        //que vaya guardando las palabras a mostrar en algun lado, PROBLEMA: como se tamaño del arreglo donde las guardo?
-        //despues hay que ordenalas por ocurrencia (con quicksort?) y mostrarlas
+        //eliminar espacios de la palabra
+        aMostrar.erase(remove(aMostrar.begin(), aMostrar.end(), ' '), aMostrar.end());
+        //la busco en el hashmap
+        HashEntry<string, int> hashEntryEncontrada = map->getHashEntry(aMostrar);
+        //si la encontro la guarda en vector
+        if (hashEntryEncontrada.clave == aMostrar) {
+            vectorPalabrasAMostrar.push_back(hashEntryEncontrada);
+        }    
+    }
+
+    if (vectorPalabrasAMostrar.size() == 0) {
+        cout << "Las palabras a mostrar no estan en el archivo de texto" << endl;
+        return;
+    }
+  
+            //para transformar el vector en arreglo
+    quickSortOcurrencias((vectorPalabrasAMostrar.data()), 0, (vectorPalabrasAMostrar.size()-1));
+    for (int i = 0; i < (vectorPalabrasAMostrar.size()); i++) {
+        cout << vectorPalabrasAMostrar[i].clave << " " << vectorPalabrasAMostrar[i].valor << endl;
     }
 
 }
@@ -292,60 +301,71 @@ unordered_map<string, Argumento> parseArgumentos(int argc, char* argv[]) {
 void ejecutarArgumentos(unordered_map<string, Argumento> args) {
 
     Argumento palabras = args["-palabras"];
-    Argumento ocurrencias = args["-ocurrrencias"];
+    Argumento ocurrencias = args["-ocurrencias"];
     Argumento mostrar = args["-mostrar"];
     Argumento excluir = args["-excluir"];
     Argumento excluirF = args["-excluirF"];
     Argumento file = args["archivo"];
 
-    HashMapList<string, int> tablaPalabras(4000, hashFunc);
+    HashMapList<string, int>* tablaPalabras = nullptr;
     string fileName = file.palabrasArgv;
 
     tablaPalabras = leerArchivo(fileName);
 
     if (excluir.id == ArgType::Excluir) {
-        
-
-        funcionExcluir(excluir.palabrasArgv);
-
+        funcionExcluir(excluir.palabrasArgv, tablaPalabras);
     }
 
     if (excluirF.id == ArgType::ExcluirF) {
-        funcionExcluirF(excluirF.palabrasArgv);
-
+        funcionExcluirF(excluirF.palabrasArgv, tablaPalabras);
     }
 
     if (palabras.id == ArgType::Palabras) {
         //para controlar si existe arg palabras, si no existe argType es nulo - PARA TODOS IGUAL
-        if(palabras.n == 0) {
-            //ordenar todo el hashmap alfabeticamente y mostrarlo
+        HashEntry<string, int>* arregloPalabras = tablaPalabras->sortAlfabetico();
+        int n;
+        if (palabras.n == 0) {
+            n = tablaPalabras->getPalabrasDiferentes(); //imprime todo el arreglo
         } else {
-            //ordenar todo el hashmap alfabeticamente y mostrar las primeras n
+            n = palabras.n; //imprime n primeros
         }
 
+        for (int i = 0; i < n; i++) {
+            cout << arregloPalabras[i].clave << endl;
+        }
     }
 
     if (ocurrencias.id == ArgType::Ocurrencias) {
-        if(ocurrencias.n == 0) {
-            //ordenar todo el hashmap por ocurrencia creciente y mostrarlo
+        cout << "ocurrencias" <<endl;
+        HashEntry<string, int>* arregloPalabras = tablaPalabras->sortOcurrencias();
+        int n;
+        if (ocurrencias.n == 0) {
+            n = tablaPalabras->getPalabrasDiferentes(); //imprime todo el arreglo
         } else {
-            //ordenar todo el hashmap por ocurrencia creciente y mostrar las primeras n
+            n = ocurrencias.n; //imprime n primeros
+        }
+        
+        for (int i = 0; i < n; i++) {
+            cout << arregloPalabras[i].clave << " " << arregloPalabras[i].valor << endl;
         }
     }
 
     if (mostrar.id == ArgType::Mostrar) {
-
-        funcionMostrar(mostrar.palabrasArgv);
+        funcionMostrar(mostrar.palabrasArgv, tablaPalabras);
     }
 }
 
 
 
 int main(int argc, char** argv) {
-
     clock_t begin;
     cout << "Comenzando a medir Tiempo\n" << endl;
     begin = clock();
+
+    if (argc == 1) {
+        cout << "grave error de usuario" << endl;
+        return -1;
+    }
 
     auto argumentos = parseArgumentos(argc, argv);
     Argumento file = argumentos["archivo"];
@@ -368,7 +388,6 @@ int main(int argc, char** argv) {
     }
     
     
-
     clock_t end = clock();
     double elapsed_secs = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
     cout << "Tardo elapsed_secs: " << elapsed_secs << "\n" << std::endl;

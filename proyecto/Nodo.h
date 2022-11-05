@@ -9,7 +9,7 @@ class Nodo {
     public:
         Nodo(T d, Nodo<T> *s) : dato(d), siguiente(s) {}
 
-        T getDato() {
+        T& getDato() {
             return dato;
         }
 

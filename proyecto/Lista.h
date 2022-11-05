@@ -33,7 +33,14 @@ class Lista {
 
         void remover(int pos);
 
-        T getDato(int pos);
+        T buscarNodo(T dato);
+
+        bool removerPrimeraIncidencia(T dato);
+        //en este caso la tabla has no guarda palabras repetidas
+        //con borrar la primera incidencia alcanza
+        // devuelve true cuando la encontro y borro; false cuando no
+
+        T& getDato(int pos);
 
         void reemplazar(int pos, T dato);
 
@@ -204,6 +211,51 @@ void Lista<T>::remover(int pos) {
     delete aBorrar;
 }
 
+template <class T>
+T Lista<T>::buscarNodo(T dato) {
+    Nodo<T>* aux = inicio;
+
+    while (aux != nullptr) {
+        if (!(dato != aux->getDato())) {
+            return aux->getDato();
+        }
+    }
+
+    //recorrio lista y no encontro el dato, devuelve un dato vacio
+    T datoDevolver;
+    return datoDevolver;
+}
+
+template <class T>
+bool Lista<T>::removerPrimeraIncidencia(T dato) {
+    Nodo<T> *aux = inicio;
+    Nodo<T> *aBorrar = inicio;
+    T dato2 = aBorrar->getDato();
+
+    if (!(dato != dato2)) {
+        inicio = aBorrar->getSiguiente();
+        delete aBorrar;
+        sizeList--;
+        return true;
+    }
+
+    while(aBorrar != nullptr && dato2 != dato) {
+        aux = aBorrar; //el aux siempre esta un nodo atras del aBorrar
+        aBorrar = aBorrar->getSiguiente();
+        dato2 = aBorrar->getDato();
+    }
+
+
+    if(aBorrar == nullptr || aux == nullptr) {
+        return false;
+    }
+
+    aux->setSiguiente(aBorrar->getSiguiente());
+    delete aBorrar;
+    sizeList--;
+    return true;
+}
+
 /**
  * Obtener el dato del nodo en la posición pos
  * @tparam T
@@ -211,7 +263,7 @@ void Lista<T>::remover(int pos) {
  * @return dato almacenado en el nodo
  */
 template <class T>
-T Lista<T>::getDato(int pos) {
+T& Lista<T>::getDato(int pos) {
     Nodo<T> *aux = inicio;
     int posActual = 0;
 

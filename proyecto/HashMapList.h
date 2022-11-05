@@ -1,12 +1,33 @@
 #pragma once
 
-#include "HashEntry.h"
 #include "Lista.h"
+#include <string>
+using namespace std;
 
 //Tabla hash con manejo de colisiones usando listas enlazadas
+
 template <class K, class T>
+struct HashEntry {
+    HashEntry() {}
+    HashEntry(K c, T v) {
+        clave = c; //palabra
+        valor = v; //ocurrencias
+    }
+
+    bool operator != (HashEntry<K, T> otro) {
+        return clave != otro.clave;
+    }
+
+    K clave; //palabra
+    T valor; //ocurrencias
+};
+
+void quickSortAlfabetico(HashEntry<string, int> *arr, int inicio, int fin);
+void quickSortOcurrencias(HashEntry<string, int> *arr, int inicio, int fin);
+
+template<class K, class T>
 class HashMapList {
-private:
+private:    
     Lista<HashEntry<K, T>> **tabla;
 
     unsigned int tamanio;
@@ -15,6 +36,8 @@ private:
 
     unsigned int (*hashFuncP)(K clave);
 
+    int palabrasDif = 0;
+
 public:
     explicit HashMapList(unsigned int k);
 
@@ -22,7 +45,9 @@ public:
 
     void getList(K clave);
 
-    void put(K clave, T valor);
+    void put(K clave);
+
+    int getPalabrasDiferentes() { return palabrasDif; }
 
     void remove(K clave);
 
@@ -31,12 +56,18 @@ public:
     bool esVacio();
 
     void print();
+
+    HashEntry<K, T> getHashEntry(K clave);
+
+    HashEntry<K, T>* transformarMapaToArreglo();
+    HashEntry<K, T>* sortAlfabetico();
+    HashEntry<K, T>* sortOcurrencias();
 };
 
 template <class K, class T>
 HashMapList<K, T>::HashMapList(unsigned int k) {
     tamanio = k;
-    tabla = new Lista<HashEntry<K, T>> *[tamanio];
+    tabla = new Lista<HashEntry<K, T>>*[tamanio];
     for(int i = 0; i < tamanio; i++) {
         tabla[i] = NULL;
     }
@@ -63,34 +94,24 @@ HashMapList<K, T>::~HashMapList() {
 }
 
 template <class K, class T>
-void HashMapList<K, T>::put(K clave, T valor) {
-    unsigned int pos = hashFuncP(clave) % tamanio;
+void HashMapList<K, T>::put(K clave) {
+    unsigned int hash = hashFuncP(clave);
+    unsigned int pos = hash % tamanio;
 
     if(tabla[pos] == NULL) {
-
         tabla[pos] = new Lista<HashEntry<K, T>>();
-
     } else {
         //controla para la lista ya existente en esa posicion,
         //si algun nodo tiene la misma clave (palabra)
         //si hay, sumarle 1 a ocurrencias
         //si no, insertar ultimo
         Nodo<HashEntry<K, T>> *aux = tabla[pos]->getInicio();
-
         while (aux != NULL) {
-
-            std::cout <<"Clave: "<< aux->getDato().getClave() << std::endl;
-            std::cout <<"Valor: "<< aux->getDato().getValor() << std::endl;
-            
-            if (clave == aux->getDato().getClave()) {
-                aux->getDato().aumentarOcurrencias(); //NO ANDA BIEN
-                std::cout <<"Ocurrencias: "<< aux->getDato().getOcurrencias() << std::endl;
-                //return; //esto sale solo del if? o del metodo tmb?
-                break;
+            if (clave == aux->getDato().clave) {
+                aux->getDato().valor++;
+                return;
             } else {
-
                 aux = aux->getSiguiente();
-
             }
 
         } 
@@ -99,7 +120,8 @@ void HashMapList<K, T>::put(K clave, T valor) {
 
     //o no habia nada en esta posicion o,
     //recorrio lista y no encontro la misma clave (palabra), hay que agregarla
-    tabla[pos]->insertarUltimo(HashEntry<K, T>(clave, valor));
+    tabla[pos]->insertarUltimo(HashEntry<K, T>(clave, 1));
+    palabrasDif++;  
 }
 
 template <class K, class T>
@@ -107,17 +129,29 @@ void HashMapList<K, T>::remove(K clave) {
     unsigned int pos = hashFuncP(clave) % tamanio;
 
     if(tabla[pos] == NULL) {
-        throw 404;
+        return;
     }
 
-    T dato; // = get(clave)
+    bool d = tabla[pos]->removerPrimeraIncidencia(HashEntry<K, T>(clave, 1));
+    if (d) {
+        palabrasDif--;
+    }
 
-    tabla[pos]->remove({clave, dato});
-
-    if(tabla[pos]->esVacio()) {
+    if(tabla[pos]->esVacia()) {
         delete tabla[pos];
         tabla[pos] = NULL;
     }
+}
+
+template <class K, class T>
+HashEntry<K, T> HashMapList<K, T>::getHashEntry(K clave) {
+    unsigned int pos = hashFuncP(clave) % tamanio;
+
+    if(tabla[pos] == NULL) {
+        return HashEntry<K, T>(); //no existe hashEntry con esa clave, devuelve un hashEntry vacio
+    }
+
+    return tabla[pos]->buscarNodo(HashEntry<K, T>(clave, 1));
 }
 
 template <class K, class T>
@@ -146,7 +180,121 @@ void HashMapList<K, T>::getList(K clave) { //Método que devuelve la lista segú
     Nodo<HashEntry<K, T>> *aux = tabla[pos]->getInicio();
 
     while (aux != NULL) {
-        std::cout << aux->getDato().getValor() << std::endl;
+        std::cout << aux->getDato().valor << std::endl;
         aux = aux->getSiguiente();
     }
+}
+
+template <class K, class T>
+void HashMapList<K, T>::print() {
+    for (int i = 0; i < tamanio; ++i) {
+        if(tabla[i] == NULL) {
+            continue;
+        }
+
+        Nodo<HashEntry<K, T>> *aux = tabla[i]->getInicio();
+        while (aux != NULL) {
+            std::cout << aux->getDato().clave << " " << aux->getDato().valor << std::endl;
+            aux = aux->getSiguiente();
+        }
+    }
+}
+
+template <class K, class T>
+HashEntry<K, T>* HashMapList<K, T>::transformarMapaToArreglo() {
+    HashEntry<K, T>* arregloPalabras = new HashEntry<K, T>[palabrasDif];
+    //pasa todos los hashentry a un arreglo
+    int pos = 0;
+    for (int i = 0; i < tamanio; ++i) {
+        if(tabla[i] == NULL) {
+            continue;
+        }
+
+        Nodo<HashEntry<K, T>> *aux = tabla[i]->getInicio();
+        while (aux != NULL) {
+            arregloPalabras[pos] = aux->getDato();
+            aux = aux->getSiguiente();
+            pos++;
+        }
+    }
+
+    return arregloPalabras;
+}
+
+void quickSortAlfabetico(HashEntry<string, int> *arr, int inicio, int fin) {
+  int i, j, medio;
+  HashEntry<string, int> pivot, aux;
+
+  medio = (inicio + fin) / 2;
+  pivot = arr[medio];
+  i = inicio;
+  j = fin;
+
+  do
+  {
+    while (arr[i].clave < pivot.clave)
+      i++;
+    while (arr[j].clave > pivot.clave)
+      j--;
+
+    if (i <= j)
+    {
+      aux = arr[i];
+      arr[i] = arr[j];
+      arr[j] = aux;
+      i++;
+      j--;
+    }
+  } while (i <= j);
+
+  if (j > inicio)
+    quickSortAlfabetico(arr, inicio, j);
+  if (i < fin)
+    quickSortAlfabetico(arr, i, fin);
+}
+
+void quickSortOcurrencias(HashEntry<string, int> *arr, int inicio, int fin) {
+    int i, j, medio;
+    HashEntry<string, int> pivot, aux;
+
+    medio = (inicio + fin) / 2;
+    pivot = arr[medio];
+    i = inicio;
+    j = fin;
+
+  do
+  {
+    while (arr[i].valor > pivot.valor)
+      i++;
+    while (arr[j].valor < pivot.valor)
+      j--;
+
+    if (i <= j)
+    {
+      aux = arr[i];
+      arr[i] = arr[j];
+      arr[j] = aux;
+      i++;
+      j--;
+    }
+  } while (i <= j);
+
+  if (j > inicio)
+    quickSortOcurrencias(arr, inicio, j);
+  if (i < fin)
+    quickSortOcurrencias(arr, i, fin);
+}
+
+template <class K, class T>
+HashEntry<K, T>* HashMapList<K, T>::sortAlfabetico() {
+    auto arr = transformarMapaToArreglo();
+    quickSortAlfabetico(arr, 0, palabrasDif-1);
+    return arr;
+}
+
+template <class K, class T>
+HashEntry<K, T>* HashMapList<K, T>::sortOcurrencias() {
+    auto arr = transformarMapaToArreglo();
+    quickSortOcurrencias(arr, 0, palabrasDif-1);
+    return arr;
 }
