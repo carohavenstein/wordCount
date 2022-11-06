@@ -22,9 +22,6 @@ struct HashEntry {
     T valor; //ocurrencias
 };
 
-void quickSortAlfabetico(HashEntry<string, int> *arr, int inicio, int fin);
-void quickSortOcurrencias(HashEntry<string, int> *arr, int inicio, int fin);
-
 template<class K, class T>
 class HashMapList {
 private:    
@@ -219,70 +216,6 @@ HashEntry<K, T>* HashMapList<K, T>::transformarMapaToArreglo() {
     }
 
     return arregloPalabras;
-}
-
-void quickSortAlfabetico(HashEntry<string, int> *arr, int inicio, int fin) {
-  int i, j, medio;
-  HashEntry<string, int> pivot, aux;
-
-  medio = (inicio + fin) / 2;
-  pivot = arr[medio];
-  i = inicio;
-  j = fin;
-
-  do
-  {
-    while (arr[i].clave < pivot.clave)
-      i++;
-    while (arr[j].clave > pivot.clave)
-      j--;
-
-    if (i <= j)
-    {
-      aux = arr[i];
-      arr[i] = arr[j];
-      arr[j] = aux;
-      i++;
-      j--;
-    }
-  } while (i <= j);
-
-  if (j > inicio)
-    quickSortAlfabetico(arr, inicio, j);
-  if (i < fin)
-    quickSortAlfabetico(arr, i, fin);
-}
-
-void quickSortOcurrencias(HashEntry<string, int> *arr, int inicio, int fin) {
-    int i, j, medio;
-    HashEntry<string, int> pivot, aux;
-
-    medio = (inicio + fin) / 2;
-    pivot = arr[medio];
-    i = inicio;
-    j = fin;
-
-  do
-  {
-    while (arr[i].valor > pivot.valor)
-      i++;
-    while (arr[j].valor < pivot.valor)
-      j--;
-
-    if (i <= j)
-    {
-      aux = arr[i];
-      arr[i] = arr[j];
-      arr[j] = aux;
-      i++;
-      j--;
-    }
-  } while (i <= j);
-
-  if (j > inicio)
-    quickSortOcurrencias(arr, inicio, j);
-  if (i < fin)
-    quickSortOcurrencias(arr, i, fin);
 }
 
 template <class K, class T>
