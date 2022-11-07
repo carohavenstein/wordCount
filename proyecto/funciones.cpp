@@ -7,6 +7,7 @@
 #include <vector>
 #include "HashMapList.h"
 #include "funciones.h"
+
 using namespace std;
 
 
@@ -50,10 +51,11 @@ void funcionesBasicas(string fileName) {
         getline(archivo,linea);
         contLineas++;
 
+        linea += '\n'; // getline saca el utlimo caracter, se lo volvemos a agregar
         string palabra = "";
 
         for (int i = 0; i < linea.length()+1; i++) {
-
+            //!ispunct(linea[i]) && !isspace(linea[i])
             if (isalpha(linea[i])){
                 contLetras += 1;
                 palabra += tolower(linea[i]);
@@ -102,11 +104,12 @@ HashMapList<string, int>* leerArchivo(string fileName) {
     while(!archivo.eof()) { //mietras no sea el final del archivo
         
         getline(archivo,linea);
-
+        linea += '\n'; // getline saca el utlimo caracter, se lo volvemos a agregar
         string palabra = "";
 
         for (int i = 0; i < linea.length()+1; i++){
 
+            //!ispunct(linea[i]) && !isspace(linea[i])
             if (isalpha(linea[i])){
                 palabra += tolower(linea[i]);
             } else {
