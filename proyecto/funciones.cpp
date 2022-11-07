@@ -60,7 +60,6 @@ void funcionesBasicas(string fileName) {
             } else {
                 if (palabra != "") {
                     //meterla en el hash map que vaya contando palabras DIF
-                    unsigned int valor = hashFunc(palabra);
                     tablaPalabras.put(palabra);
                     contPalabras++;
                 }
@@ -112,8 +111,7 @@ HashMapList<string, int>* leerArchivo(string fileName) {
                 palabra += tolower(linea[i]);
             } else {
                 if (palabra != "") {
-                    //meterla en el hash map que vaya contando palabras DIF !!!!!!!!!!!!!!
-                    unsigned int valor = hashFunc(palabra);
+                    //meterla en el hash map que vaya contando palabras DIF
                     tablaPalabras->put(palabra);
                 }
                 palabra = "";
@@ -318,6 +316,8 @@ void ejecutarArgumentos(unordered_map<string, Argumento> args) {
         for (int i = 0; i < n; i++) {
             cout << arregloPalabras[i].clave << endl;
         }
+
+        delete[] arregloPalabras;
     }
 
     if (ocurrencias.id == ArgType::Ocurrencias) {
@@ -333,11 +333,15 @@ void ejecutarArgumentos(unordered_map<string, Argumento> args) {
         for (int i = 0; i < n; i++) {
             cout << arregloPalabras[i].clave << " " << arregloPalabras[i].valor << endl;
         }
+
+        delete[] arregloPalabras;
     }
 
     if (mostrar.id == ArgType::Mostrar) {
         funcionMostrar(mostrar.palabrasArgv, tablaPalabras);
     }
+
+    delete tablaPalabras;
 }
 
 void quickSortAlfabetico(HashEntry<string, int> *arr, int inicio, int fin) {
