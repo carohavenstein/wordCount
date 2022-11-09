@@ -55,8 +55,9 @@ void funcionesBasicas(string fileName) {
         string palabra = "";
 
         for (int i = 0; i < linea.length()+1; i++) {
-            //!ispunct(linea[i]) && !isspace(linea[i])
-            if (isalpha(linea[i])){
+            //!ispunct(linea[i]) && !isspace(linea[i]) (para castellano)
+            //isalpha(linea[i]) (para ingles)
+            if (!ispunct(linea[i]) && !isspace(linea[i])){
                 contLetras += 1;
                 palabra += tolower(linea[i]);
             } else {
@@ -109,8 +110,9 @@ HashMapList<string, int>* leerArchivo(string fileName) {
 
         for (int i = 0; i < linea.length()+1; i++){
 
-            //!ispunct(linea[i]) && !isspace(linea[i])
-            if (isalpha(linea[i])){
+            //!ispunct(linea[i]) && !isspace(linea[i]) (para castellano)
+            //isalpha(linea[i]) (para ingles)
+            if (!ispunct(linea[i]) && !isspace(linea[i])){
                 palabra += tolower(linea[i]);
             } else {
                 if (palabra != "") {
@@ -153,7 +155,6 @@ void funcionExcluirF(string palabrasArgv, HashMapList<string, int>* map){
         cout<<"No se pudo abrir el archivo";
         exit(1);
     }
-
     string linea;
 
     while(!archivo.eof()) { //mietras no sea el final del archivo
@@ -320,11 +321,9 @@ void ejecutarArgumentos(unordered_map<string, Argumento> args) {
             cout << arregloPalabras[i].clave << endl;
         }
 
-        delete[] arregloPalabras;
     }
 
     if (ocurrencias.id == ArgType::Ocurrencias) {
-        cout << "ocurrencias" <<endl;
         HashEntry<string, int>* arregloPalabras = tablaPalabras->sortOcurrencias();
         int n;
         if (ocurrencias.n == 0) {
@@ -337,14 +336,12 @@ void ejecutarArgumentos(unordered_map<string, Argumento> args) {
             cout << arregloPalabras[i].clave << " " << arregloPalabras[i].valor << endl;
         }
 
-        delete[] arregloPalabras;
     }
 
     if (mostrar.id == ArgType::Mostrar) {
         funcionMostrar(mostrar.palabrasArgv, tablaPalabras);
     }
 
-    delete tablaPalabras;
 }
 
 void quickSortAlfabetico(HashEntry<string, int> *arr, int inicio, int fin) {

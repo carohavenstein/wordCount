@@ -219,6 +219,7 @@ T Lista<T>::buscarNodo(T dato) {
         if (!(dato != aux->getDato())) {
             return aux->getDato();
         }
+        aux = aux->getSiguiente();
     }
 
     //recorrio lista y no encontro el dato, devuelve un dato vacio
@@ -241,10 +242,9 @@ bool Lista<T>::removerPrimeraIncidencia(T dato) {
 
     while(aBorrar != nullptr && dato2 != dato) {
         aux = aBorrar; //el aux siempre esta un nodo atras del aBorrar
-        aBorrar = aBorrar->getSiguiente();
         dato2 = aBorrar->getDato();
+        aBorrar = aBorrar->getSiguiente();
     }
-
 
     if(aBorrar == nullptr || aux == nullptr) {
         return false;
